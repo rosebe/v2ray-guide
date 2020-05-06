@@ -15,7 +15,10 @@
     {
       "port": 1080,
       "protocol": "socks",
-      "domainOverride": ["tls","http"],
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      },
       "settings": {
         "auth": "noauth",
         "udp": true
@@ -55,10 +58,10 @@
         "domain": ["geosite:cn"] // 中国大陆主流网站的域名
       },
       {
-        "type": "chinaip",
+        "type": "field",
         "outboundTag": "direct",
         "ip": [
-          "geoip:cn"，// 中国大陆的 IP
+          "geoip:cn", // 中国大陆的 IP
           "geoip:private" // 私有地址 IP，如路由器等
         ]
       }

@@ -34,59 +34,56 @@
       }
     ]
   },
-  "outbound":{  
-    //A连接B的outbound  
-    "tag":"tunnel", // A 连接 B 的 outbound 的标签，在路由中会用到
-    "protocol":"vmess",
-    "settings":{  
-      "vnext":[  
-        {  
-          "address":"serveraddr.com", // B 地址，IP 或 实际的域名
-          "port":16823,
-          "users":[  
-            {  
-              "id":"b831381d-6324-4d53-ad4f-8cda48b30811",
-              "alterId":64
-            }
-          ]
-        }
-      ]
-    }
-  },
-  "outboundDetour":[  
+  "outbounds": [
+    {  
+      //A连接B的outbound  
+      "tag":"tunnel", // A 连接 B 的 outbound 的标签，在路由中会用到
+      "protocol":"vmess",
+      "settings":{  
+        "vnext":[  
+          {  
+            "address":"serveraddr.com", // B 地址，IP 或 实际的域名
+            "port":16823,
+            "users":[  
+              {  
+                "id":"b831381d-6324-4d53-ad4f-8cda48b30811",
+                "alterId":64
+              }
+            ]
+          }
+        ]
+      }
+    },
     // 另一个 outbound，最终连接私有网盘    
     {  
       "protocol":"freedom",
       "settings":{  
       },
       "tag":"out"
-    }
+    }    
   ],
-  "routing":{  
-    "strategy":"rules",
-    "settings":{  
-      "rules":[  
-        {  
+  "routing":{   
+    "rules":[  
+      {  
         // 配置 A 主动连接 B 的路由规则
-          "type":"field",
-          "inboundTag":[  
-            "bridge"
-          ],
-          "domain":[  
-            "full:private.cloud.com"
-          ],
-          "outboundTag":"tunnel"
-        },
-        {  
+        "type":"field",
+        "inboundTag":[  
+          "bridge"
+        ],
+        "domain":[  
+          "full:private.cloud.com"
+        ],
+        "outboundTag":"tunnel"
+      },
+      {  
         // 反向连接访问私有网盘的规则
-          "type":"field",
-          "inboundTag":[  
-            "bridge"
-          ],
-          "outboundTag":"out"
-        }
-      ]
-    }
+        "type":"field",
+        "inboundTag":[  
+          "bridge"
+        ],
+        "outboundTag":"out"
+      }
+    ]
   }
 }
 ```
@@ -103,19 +100,19 @@
       }
     ]
   },
-  "inbound":{  
-    // 接受 C 的inbound
-    "tag":"external", // 标签，路由中用到
-    "port":80,
-    // 开放 80 端口，用于接收外部的 HTTP 访问 
-    "protocol":"dokodemo-door",
-      "settings":{  
-        "address":"127.0.0.1",
-        "port":80, //假设 NAS 监听的端口为 80
-        "network":"tcp"
-      }
-  },
-  "inboundDetour":[  
+  "inbounds": [
+    {  
+      // 接受 C 的inbound
+      "tag":"external", // 标签，路由中用到
+      "port":80,
+      // 开放 80 端口，用于接收外部的 HTTP 访问 
+      "protocol":"dokodemo-door",
+        "settings":{  
+          "address":"127.0.0.1",
+          "port":80, //假设 NAS 监听的端口为 80
+          "network":"tcp"
+        }
+    },
     // 另一个 inbound，接受 A 主动发起的请求  
     {  
       "tag": "tunnel",// 标签，路由中用到
@@ -132,39 +129,36 @@
     }
   ],
   "routing":{  
-    "strategy":"rules",
-    "settings":{  
-      "rules":[  
-        {  //路由规则，接收 C 请求后发给 A
-          "type":"field",
-          "inboundTag":[  
-            "external"
-          ],
-          "outboundTag":"portal"
-        },
-        {  //路由规则，让 B 能够识别这是 A 主动发起的反向代理连接
-          "type":"field",
-          "inboundTag":[  
-            "tunnel"
-          ],
-          "domain":[  
-            "full:private.cloud.com"
-          ],
-          "outboundTag":"portal"
-        }
-      ]
-    }
+    "rules":[  
+      {  //路由规则，接收 C 请求后发给 A
+        "type":"field",
+        "inboundTag":[  
+          "external"
+        ],
+        "outboundTag":"portal"
+      },
+      {  //路由规则，让 B 能够识别这是 A 主动发起的反向代理连接
+        "type":"field",
+        "inboundTag":[  
+          "tunnel"
+        ],
+        "domain":[  
+          "full:private.cloud.com"
+        ],
+        "outboundTag":"portal"
+      }
+    ]
   }
 }
 ```
 
 ## 访问
 
-配置好 A 和 B 的 V2Ray 配置后，先后运行 A 和 B 的 V2Ray，同时搭建在 A 私有网盘也要运行。然后 C 连接跟 A 不同的网络（比如说到邻居家蹭网），用浏览器访问 B 的 IP 或域名，这时就能内网穿透访问私有网盘了。
+配置好 A 和 B 的 V2Ray 配置后，先后运行 A 和 B 的 V2Ray，同时搭建在 A 私有网盘也要运行。然后 C 接入跟 A 不同的网络（比如说到邻居家蹭网），用浏览器访问 B 的 IP 或域名，这时就能内网穿透访问私有网盘了。
 
 
 ## 更新历史
 
 - 2018-10-31 初版
-
+- 2019-01-13 V4.0+ 配置格式
 
